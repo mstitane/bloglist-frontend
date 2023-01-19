@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Notification from "./components/Notification";
 
 const App = () => {
     const [blogs, setBlogs] = useState([])
@@ -12,6 +13,9 @@ const App = () => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
+    const SUCCESS = 'SUCCESS';
+    const ERROR = 'ERROR';
+
 
     useEffect(() => {
         blogService.getAll().then(blogs =>
@@ -26,6 +30,13 @@ const App = () => {
             setUser(user)
         }
     }, [])
+
+    const fireMessage = (message, type) => {
+        setErrorMessage({text: message, type: type})
+        setTimeout(() => {
+            setErrorMessage({text: null, type: null})
+        }, 5000)
+    }
 
     const handleLogin = async (event) => {
         event.preventDefault()
@@ -42,10 +53,7 @@ const App = () => {
             setUsername('')
             setPassword('')
         } catch (exception) {
-            setErrorMessage('Wrong credentials')
-            setTimeout(() => {
-                setErrorMessage(null)
-            }, 5000)
+            fireMessage('Wrong credentials', ERROR)
         }
     }
 
@@ -88,9 +96,15 @@ const App = () => {
             author,
             url
         }
-        blogService.create(newBlog).then(returnedBlog =>
-            setBlogs(blogs.concat(returnedBlog))
-        )
+        try {
+            blogService.create(newBlog).then(returnedBlog => {
+                    setBlogs(blogs.concat(returnedBlog));
+                    fireMessage('a new blog [' + title + '] by [' + author + '] added', SUCCESS)
+                }
+            )
+        } catch (exception) {
+            fireMessage(exception, ERROR)
+        }
     }
 
     const blogsList = () => (
@@ -136,6 +150,7 @@ const App = () => {
     return (
         <div>
             <h2>blogs</h2>
+            <Notification message={errorMessage}/>
             {user === null ? loginForm() : blogsList()}
 
         </div>
