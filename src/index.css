@@ -16,3 +16,13 @@
     padding: 10px;
     margin-bottom: 10px;
 }
+.blog {
+    border: 2px solid;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    padding-top: 10px;
+}
+
+.blog div {
+    margin-left: 2px;
+}
