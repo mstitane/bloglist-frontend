@@ -1,8 +1,12 @@
-import {useState, useEffect} from 'react'
+import {useEffect, useState} from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from "./components/Notification";
+import LoginForm from "./components/LoginForm";
+import Togglable from "./components/Togglable";
+import BlogForm from "./components/BlogForm";
+
 
 const App = () => {
     const [blogs, setBlogs] = useState([])
@@ -10,12 +14,9 @@ const App = () => {
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
     const [errorMessage, setErrorMessage] = useState(null)
-    const [title, setTitle] = useState('')
-    const [author, setAuthor] = useState('')
-    const [url, setUrl] = useState('')
     const SUCCESS = 'SUCCESS';
     const ERROR = 'ERROR';
-
+    const [loginVisible, setLoginVisible] = useState(false)
 
     useEffect(() => {
         blogService.getAll().then(blogs =>
@@ -62,46 +63,38 @@ const App = () => {
         window.localStorage.removeItem('logged_blogs_app_user')
         setUser(null)
     }
-    const loginForm = () => (
-        <div>
-            <h2>Log in to application</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    username
-                    <input
-                        type="text"
-                        value={username}
-                        name="Username"
-                        onChange={({target}) => setUsername(target.value)}
-                    />
-                </div>
-                <div>
-                    password
-                    <input
-                        type="password"
-                        value={password}
-                        name="Password"
-                        onChange={({target}) => setPassword(target.value)}
-                    />
-                </div>
-                <button type="submit">login</button>
-            </form>
-        </div>
-    )
+    const loginForm = () => {
+        const hideWhenVisible = {display: loginVisible ? 'none' : ''}
+        const showWhenVisible = {display: loginVisible ? '' : 'none'}
 
-    const handleNewBlog = (event) => {
-        event.preventDefault()
-        const newBlog = {
-            title,
-            author,
-            url
-        }
+        return (
+            <div>
+                <div style={hideWhenVisible}>
+                    <button onClick={() => setLoginVisible(true)}>log in</button>
+                </div>
+                <div style={showWhenVisible}>
+                    <LoginForm
+                        username={username}
+                        password={password}
+                        handleUsernameChange={({target}) => setUsername(target.value)}
+                        handlePasswordChange={({target}) => setPassword(target.value)}
+                        handleSubmit={handleLogin}
+                    />
+                    <button onClick={() => setLoginVisible(false)}>cancel</button>
+                </div>
+            </div>
+        )
+    }
+
+    const handleNewBlog = (newBlog) => {
         try {
             blogService.create(newBlog).then(returnedBlog => {
                     setBlogs(blogs.concat(returnedBlog));
-                    fireMessage('a new blog [' + title + '] by [' + author + '] added', SUCCESS)
-                }
-            )
+                    fireMessage('a new blog [' + returnedBlog.title + '] by [' + returnedBlog.author + '] added', SUCCESS)
+                })
+                .catch(e => {
+                    fireMessage(e, ERROR)
+                })
         } catch (exception) {
             fireMessage(exception, ERROR)
         }
@@ -110,37 +103,12 @@ const App = () => {
     const blogsList = () => (
         <div>
             <div>{user.name} logged-in <button name="logout" onClick={handleLogout}>logout</button></div>
-            <h2>create new blog</h2>
-            <form onSubmit={handleNewBlog}>
-                <div>
-                    title :
-                    <input
-                        type="text"
-                        value={title}
-                        name="Title"
-                        onChange={({target}) => setTitle(target.value)}
-                    />
-                </div>
-                <div>
-                    author :
-                    <input
-                        type="text"
-                        value={author}
-                        name="Author"
-                        onChange={({target}) => setAuthor(target.value)}
-                    />
-                </div>
-                <div>
-                    url :
-                    <input
-                        type="text"
-                        value={url}
-                        name="Url"
-                        onChange={({target}) => setUrl(target.value)}
-                    />
-                </div>
-                <button type="submit">create</button>
-            </form>
+            <br/>
+            <Togglable buttonLabel="new blog">
+                <h2>create new blog</h2>
+                <BlogForm createBlog={handleNewBlog}/>
+            </Togglable>
+            <br/>
             <div>
                 {blogs.map(obj => <Blog key={obj.id} blog={obj}/>)}
             </div>
