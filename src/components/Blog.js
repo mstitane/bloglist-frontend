@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-const Blog = ({blog, updateLikes}) => {
+const Blog = ({blog, updateLikes, deleteBlog, displayDelete}) => {
     const [visible, setVisible] = useState(false)
 
     const hideWhenVisible = {display: visible ? 'none' : ''}
@@ -15,6 +15,12 @@ const Blog = ({blog, updateLikes}) => {
             likes: blog.likes + 1
         })
     }
+
+    const handleDeleteButton = (blog) => {
+        if (window.confirm(`Are you sure you want to remove this blog ${blog.title} ?`))
+            deleteBlog(blog)
+    }
+    const hideWhenUserIsDifferent = {display: displayDelete ?  '' : 'none'}
 
     return (
         <div className="blog">
@@ -31,7 +37,9 @@ const Blog = ({blog, updateLikes}) => {
                     <button onClick={() => handleLikeButton(blog)}>like</button>
                 </div>
                 <div> {blog.author}</div>
-
+                <div style={hideWhenUserIsDifferent}>
+                    <button onClick={() => handleDeleteButton(blog)}>remove</button>
+                </div>
             </div>
         </div>
     )

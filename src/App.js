@@ -113,6 +113,19 @@ const App = () => {
             fireMessage(exception, ERROR)
         }
     }
+    const handleDeleteBlog = (toDeleteBlog) => {
+        try {
+            blogService.remove(toDeleteBlog).then(() => {
+                fireMessage('the blog [' + toDeleteBlog.title + '] is deleted', SUCCESS)
+                setBlogs(sortByLikes(blogs.filter(b => b.id !== toDeleteBlog.id)));
+            })
+                .catch(e => {
+                    fireMessage(e.message, ERROR)
+                })
+        } catch (exception) {
+            fireMessage(exception, ERROR)
+        }
+    }
 
     const sortByLikes = (blogs) => {
         return blogs.sort((a, b) => b.likes - a.likes)
@@ -128,7 +141,9 @@ const App = () => {
             </Togglable>
             <br/>
             <div>
-                {blogs.map(obj => <Blog key={obj.id} blog={obj} updateLikes={handleUpdateLikes}/>)}
+                {blogs.map(obj =>
+                    <Blog key={obj.id} blog={obj} updateLikes={handleUpdateLikes}
+                          deleteBlog={handleDeleteBlog} displayDelete={user.username === obj.user.username}/>)}
             </div>
         </div>
     )
