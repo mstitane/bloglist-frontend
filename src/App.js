@@ -20,7 +20,7 @@ const App = () => {
 
     useEffect(() => {
         blogService.getAll().then(blogs =>
-            setBlogs(blogs)
+            setBlogs(sortByLikes(blogs))
         )
     }, [])
 
@@ -89,15 +89,33 @@ const App = () => {
     const handleNewBlog = (newBlog) => {
         try {
             blogService.create(newBlog).then(returnedBlog => {
-                    setBlogs(blogs.concat(returnedBlog));
-                    fireMessage('a new blog [' + returnedBlog.title + '] by [' + returnedBlog.author + '] added', SUCCESS)
-                })
+                setBlogs(sortByLikes(blogs.concat(returnedBlog)));
+                fireMessage('a new blog [' + returnedBlog.title + '] by [' + returnedBlog.author + '] added', SUCCESS)
+            })
                 .catch(e => {
-                    fireMessage(e, ERROR)
+                    fireMessage(e.message, ERROR)
                 })
         } catch (exception) {
             fireMessage(exception, ERROR)
         }
+    }
+
+    const handleUpdateLikes = (updatedBlog) => {
+        try {
+            blogService.update(updatedBlog).then(returnedBlog => {
+                fireMessage('you liked the blog [' + returnedBlog.title + ']', SUCCESS)
+                setBlogs(sortByLikes(blogs.map(b => b.id === updatedBlog.id ? updatedBlog : b)));
+            })
+                .catch(e => {
+                    fireMessage(e.message, ERROR)
+                })
+        } catch (exception) {
+            fireMessage(exception, ERROR)
+        }
+    }
+
+    const sortByLikes = (blogs) => {
+        return blogs.sort((a, b) => b.likes - a.likes)
     }
 
     const blogsList = () => (
@@ -110,7 +128,7 @@ const App = () => {
             </Togglable>
             <br/>
             <div>
-                {blogs.map(obj => <Blog key={obj.id} blog={obj}/>)}
+                {blogs.map(obj => <Blog key={obj.id} blog={obj} updateLikes={handleUpdateLikes}/>)}
             </div>
         </div>
     )
