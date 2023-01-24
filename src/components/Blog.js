@@ -1,10 +1,10 @@
-import {useState} from "react";
+import { useState } from 'react'
 
-const Blog = ({blog, updateLikes, deleteBlog, displayDelete}) => {
+const Blog = ({ blog, updateLikes, deleteBlog, displayDelete }) => {
     const [visible, setVisible] = useState(false)
 
-    const hideWhenVisible = {display: visible ? 'none' : ''}
-    const showWhenVisible = {display: visible ? '' : 'none'}
+    const hideWhenVisible = { display: visible ? 'none' : '' }
+    const showWhenVisible = { display: visible ? '' : 'none' }
 
     const toggleVisibility = () => {
         setVisible(!visible)
@@ -20,7 +20,7 @@ const Blog = ({blog, updateLikes, deleteBlog, displayDelete}) => {
         if (window.confirm(`Are you sure you want to remove this blog ${blog.title} ?`))
             deleteBlog(blog)
     }
-    const hideWhenUserIsDifferent = {display: displayDelete ?  '' : 'none'}
+    const hideWhenUserIsDifferent = { display: displayDelete ? '' : 'none' }
 
     return (
         <div className="blog">

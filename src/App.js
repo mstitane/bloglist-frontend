@@ -1,11 +1,11 @@
-import {useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import Notification from "./components/Notification";
-import LoginForm from "./components/LoginForm";
-import Togglable from "./components/Togglable";
-import BlogForm from "./components/BlogForm";
+import Notification from './components/Notification'
+import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 
 
 const App = () => {
@@ -14,14 +14,12 @@ const App = () => {
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
     const [errorMessage, setErrorMessage] = useState(null)
-    const SUCCESS = 'SUCCESS';
-    const ERROR = 'ERROR';
+    const SUCCESS = 'SUCCESS'
+    const ERROR = 'ERROR'
     const [loginVisible, setLoginVisible] = useState(false)
 
     useEffect(() => {
-        blogService.getAll().then(blogs =>
-            setBlogs(sortByLikes(blogs))
-        )
+        getAllBlogs()
     }, [])
 
     useEffect(() => {
@@ -32,10 +30,15 @@ const App = () => {
         }
     }, [])
 
+    function getAllBlogs(){
+        blogService.getAll().then(blogs =>
+            setBlogs(sortByLikes(blogs))
+        )
+    }
     const fireMessage = (message, type) => {
-        setErrorMessage({text: message, type: type})
+        setErrorMessage({ text: message, type: type })
         setTimeout(() => {
-            setErrorMessage({text: null, type: null})
+            setErrorMessage({ text: null, type: null })
         }, 5000)
     }
 
@@ -64,8 +67,8 @@ const App = () => {
         setUser(null)
     }
     const loginForm = () => {
-        const hideWhenVisible = {display: loginVisible ? 'none' : ''}
-        const showWhenVisible = {display: loginVisible ? '' : 'none'}
+        const hideWhenVisible = { display: loginVisible ? 'none' : '' }
+        const showWhenVisible = { display: loginVisible ? '' : 'none' }
 
         return (
             <div>
@@ -76,8 +79,8 @@ const App = () => {
                     <LoginForm
                         username={username}
                         password={password}
-                        handleUsernameChange={({target}) => setUsername(target.value)}
-                        handlePasswordChange={({target}) => setPassword(target.value)}
+                        handleUsernameChange={({ target }) => setUsername(target.value)}
+                        handlePasswordChange={({ target }) => setPassword(target.value)}
                         handleSubmit={handleLogin}
                     />
                     <button onClick={() => setLoginVisible(false)}>cancel</button>
@@ -89,8 +92,8 @@ const App = () => {
     const handleNewBlog = (newBlog) => {
         try {
             blogService.create(newBlog).then(returnedBlog => {
-                setBlogs(sortByLikes(blogs.concat(returnedBlog)));
                 fireMessage('a new blog [' + returnedBlog.title + '] by [' + returnedBlog.author + '] added', SUCCESS)
+                getAllBlogs()
             })
                 .catch(e => {
                     fireMessage(e.message, ERROR)
@@ -104,7 +107,7 @@ const App = () => {
         try {
             blogService.update(updatedBlog).then(returnedBlog => {
                 fireMessage('you liked the blog [' + returnedBlog.title + ']', SUCCESS)
-                setBlogs(sortByLikes(blogs.map(b => b.id === updatedBlog.id ? updatedBlog : b)));
+                getAllBlogs()
             })
                 .catch(e => {
                     fireMessage(e.message, ERROR)
@@ -117,7 +120,7 @@ const App = () => {
         try {
             blogService.remove(toDeleteBlog).then(() => {
                 fireMessage('the blog [' + toDeleteBlog.title + '] is deleted', SUCCESS)
-                setBlogs(sortByLikes(blogs.filter(b => b.id !== toDeleteBlog.id)));
+                getAllBlogs()
             })
                 .catch(e => {
                     fireMessage(e.message, ERROR)
@@ -143,7 +146,7 @@ const App = () => {
             <div>
                 {blogs.map(obj =>
                     <Blog key={obj.id} blog={obj} updateLikes={handleUpdateLikes}
-                          deleteBlog={handleDeleteBlog} displayDelete={user.username === obj.user.username}/>)}
+                        deleteBlog={handleDeleteBlog} displayDelete={user.username === obj.user.username}/>)}
             </div>
         </div>
     )
