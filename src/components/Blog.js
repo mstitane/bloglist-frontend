@@ -34,7 +34,7 @@ const Blog = ({ blog, updateLikes, deleteBlog, displayDelete }) => {
                 </div>
                 <div id="blog-url"> {blog.url}</div>
                 <div id="blog-likes"> likes {blog.likes}
-                    <button onClick={() => handleLikeButton(blog)}>like</button>
+                    <button id="button-likes" onClick={() => handleLikeButton(blog)}>like</button>
                 </div>
                 <div id="blog-author"> {blog.author}</div>
                 <div style={hideWhenUserIsDifferent}>

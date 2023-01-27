@@ -48,3 +48,26 @@ test('clicking the button shows the url and number of likes', async () => {
     expect(likesDisplayed.innerHTML).toContain(`likes ${blog.likes}`)
 
 })
+
+test('if the like button is clicked twice, the event handler the component received as props is called twice', async () => {
+    const blog = {
+        title: 'React-testing-library',
+        author: 'Mohammed STITANE',
+        url: 'http://test.url.com',
+        likes : 11
+    }
+
+    const mockHandler = jest.fn()
+
+    const { container } = render(<Blog blog={blog} updateLikes={mockHandler}/>)
+
+    const user = userEvent.setup()
+    const showButton = screen.getByText('view')
+    await user.click(showButton)
+
+    const buttonLikes = container.querySelector('#button-likes')
+    await user.click(buttonLikes)
+    await user.click(buttonLikes)
+    expect(mockHandler.mock.calls).toHaveLength(2)
+
+})
