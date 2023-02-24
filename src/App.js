@@ -136,7 +136,7 @@ const App = () => {
 
     const blogsList = () => (
         <div>
-            <div>{user.name} logged-in <button name="logout" onClick={handleLogout}>logout</button></div>
+            <div>{user.name} logged-in <button id="logout-button" name="logout" onClick={handleLogout}>logout</button></div>
             <br/>
             <Togglable buttonLabel="new blog">
                 <h2>create new blog</h2>

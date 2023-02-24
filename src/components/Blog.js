@@ -33,7 +33,8 @@ const Blog = ({ blog, updateLikes, deleteBlog, displayDelete }) => {
                     <button onClick={toggleVisibility}>hide</button>
                 </div>
                 <div id="blog-url"> {blog.url}</div>
-                <div id="blog-likes"> likes {blog.likes}
+                <div id="blog-likes">
+                    likes <span id="nb-likes">{blog.likes}</span>
                     <button id="button-likes" onClick={() => handleLikeButton(blog)}>like</button>
                 </div>
                 <div id="blog-author"> {blog.author}</div>
